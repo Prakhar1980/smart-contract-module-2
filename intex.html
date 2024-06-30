@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SMART CONTRACT MANAGEMENT</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="integrate.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0 auto;
+      max-width: 600px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #4e1277;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+
+    .myButton {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease;
+    }
+
+    .myButton:hover {
+      background-color: #45a049;
+    }
+
+    .thirdButton {
+      background-color: #FF0000;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    #balance {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <h1>SMART CONTRACT MANAGEMENT</h1>
+    <p id="currentTime"></p>
+    <input type="text" id="amount" placeholder="Enter amount...">
+    <p id="balance">Loading...</p>
+    <button id="deposit" class="myButton" onclick="deposit()">Deposit Cryptocurrency</button>
+    <button id="withdraw" class="myButton" onclick="withdraw()">Withdraw Cryptocurrency</button>
+    <button id="button3" class="myButton thirdButton" onclick="checkBalance()">Check Total Cryptocurrency</button>
+  </div>
+
+  <script>
+    var contract;
+
+    $(document).ready(function() {
+      web3 = new Web3(web3.currentProvider);
+      var address = "0xf73Ae3e8A1f202696F1FDe0a92653091353C96a66";
+      var abi = [
+        // Your contract ABI array here
+      ];
+
+      contract = new web3.eth.Contract(abi, address);
+
+      // Fetch initial balance
+      contract.methods.getBalance().call().then(function(bal) {
+        $('#balance').html(bal);
+      });
+    });
+
+    function deposit() {
+      var amt = parseInt($("#amount").val() || 0);
+      web3.eth.getAccounts().then(function(accounts) {
+        var acc = accounts[0];
+        return contract.methods.deposit(amt).send({ from: acc });
+      }).then(function(tx) {
+        console.log('Deposit successful:', tx);
+        // Optionally update UI or show success message
+      }).catch(function(error) {
+        console.error('Deposit error:', error);
+        // Handle error (e.g., display error message)
+      });
+    }
+
+    function withdraw() {
+      var amt = parseInt($("#amount").val() || 0);
+      web3.eth.getAccounts().then(function(accounts) {
+        var acc = accounts[0];
+        return contract.methods.withdraw(amt).send({ from: acc });
+      }).then(function(tx) {
+        console.log('Withdrawal successful:', tx);
+        // Optionally update UI or show success message
+      }).catch(function(error) {
+        console.error('Withdrawal error:', error);
+        // Handle error (e.g., display error message)
+      });
+    }
+
+    function checkBalance() {
+      contract.methods.getBalance().call().then(function(bal) {
+        $('#balance').html(bal);
+      }).catch(function(error) {
+        console.error('Balance check error:', error);
+        // Handle error (e.g., display error message)
+      });
+    }
+  </script>
+</body>
+</html>
